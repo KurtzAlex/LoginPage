@@ -69,11 +69,15 @@ app.get('/loggedin', (req, res) => {
 app.post('/create-user', (req, res) => {
     connection.query(`SELECT * FROM Users`, (error, results, fields) => {
         const user = results.find(user => user.Email === req.body.email && user.password === req.body.password);
-        if (user) {
+        const admin = results.find(admin => admin.Email === req.body.email && admin.password === req.body.password && admin.isAdmin == 1);
+	if(admin){
             req.flash('success', 'Successfully logged in');
-            res.redirect('/loggedin');
+            res.sendFile(path.resolve(__dirname + '/frontend/admin-homepage.html'));
+	 } else if (user) {
+           req.flash('success', 'Successfully logged in');
+           res.sendFile(path.resolve(__dirname + '/frontend/profilepage.html'));
         } else {
-             req.flash('error', 'invalid username and password');
+            req.flash('error', 'invalid username and password');
             res.redirect('/');
         }
     });
